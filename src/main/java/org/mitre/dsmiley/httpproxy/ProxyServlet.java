@@ -82,7 +82,7 @@ public class ProxyServlet extends HttpServlet {
         }
         HttpParams hcParams = new BasicHttpParams();
         readConfigParam(hcParams, ClientPNames.HANDLE_REDIRECTS, Boolean.class);
-        proxy = new Proxy(targetUri, createHttpClient(hcParams), doLog);
+        proxy = new Proxy(targetUri, createHttpClient(hcParams), "", doLog);
 
     }
 

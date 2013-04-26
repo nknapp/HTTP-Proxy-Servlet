@@ -45,19 +45,23 @@ public final class Proxy implements HTTPProxy {
     private boolean doLog = false;
     private HttpClient proxyClient;
     private URI target;
+    //the path to the proxy, this will be stripped out of the request to be made against the target
+    private String proxyPath;
 
-    public Proxy(URI target) {
-        this(target, new DefaultHttpClient(new ThreadSafeClientConnManager(), new BasicHttpParams()));
+    public Proxy(URI target, String proxyPath) {
+        this(target, new DefaultHttpClient(new ThreadSafeClientConnManager(), new BasicHttpParams()), proxyPath);
     }
 
-    public Proxy(URI target, HttpClient httpClient) {
-        this(target, httpClient, true);
+    public Proxy(URI target, HttpClient httpClient, String proxyPath) {
+        this(target, httpClient, proxyPath, true);
     }
 
-    public Proxy(URI target, HttpClient httpClient, boolean doLog) {
+    public Proxy(URI target, HttpClient httpClient, String proxyPath, boolean doLog) {
+        assert proxyPath != null;
         this.proxyClient = httpClient;
         this.target = target;
         this.doLog = doLog;
+        this.proxyPath = proxyPath.toLowerCase();
     }
 
     public void shutdown() {
@@ -133,8 +137,13 @@ public final class Proxy implements HTTPProxy {
         StringBuilder uri = new StringBuilder(500);
         uri.append(this.target.toString());
         // Handle the path given to the servlet
-        if (servletRequest.getPathInfo() != null) {//ex: /my/path.html
-            uri.append(encodeUriQuery(servletRequest.getPathInfo()));
+        String pathInfo = servletRequest.getPathInfo();
+        if (pathInfo != null) {//ex: /my/path.html
+            if (pathInfo.toLowerCase().startsWith(proxyPath)) {
+                uri.append(encodeUriQuery(pathInfo.substring(proxyPath.length())));
+            } else {
+                uri.append(encodeUriQuery(pathInfo));
+            }
         }
         // Handle the query string
         String queryString = servletRequest.getQueryString();//ex:(following '?'): name=value&foo=bar#fragment
