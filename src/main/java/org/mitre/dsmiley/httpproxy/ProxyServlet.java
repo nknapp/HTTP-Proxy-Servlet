@@ -59,7 +59,7 @@ public class ProxyServlet extends HttpServlet {
 
     protected boolean doLog = false;
     protected URI targetUri;
-    private Proxy proxy;
+    private HTTPProxy proxy;
 
     @Override
     public String getServletInfo() {

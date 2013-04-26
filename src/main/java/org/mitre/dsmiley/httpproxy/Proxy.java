@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * @author gpaul
  *         Created on 4/26/13 7:48 AM
  */
-public final class Proxy {
+public final class Proxy implements HTTPProxy {
     private final Logger log = Logger.getLogger(getClass().getName());
     private boolean doLog = false;
     private HttpClient proxyClient;
