@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Formatter;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -47,6 +49,15 @@ public final class Proxy implements HTTPProxy {
     private URI target;
     //the path to the proxy, this will be stripped out of the request to be made against the target
     private String proxyPath;
+    private HeaderModificatons headerModificatons = new HeaderModificatons() {
+        public Set<String> removals(HttpServletRequest servletRequest) {
+            return Collections.emptySet();
+        }
+
+        public HeaderGroup additions(HttpServletRequest servletRequest) {
+            return new HeaderGroup();
+        }
+    };
 
     public Proxy(URI target, String proxyPath) {
         this(target, new DefaultHttpClient(new ThreadSafeClientConnManager(), new BasicHttpParams()), proxyPath);
@@ -173,6 +184,10 @@ public final class Proxy implements HTTPProxy {
                 continue;
             if (hopByHopHeaders.containsHeader(headerName))
                 continue;
+            if (headerModificatons.removals(servletRequest).contains(headerName)) {
+                continue;
+            }
+
             // As per the Java Servlet API 2.5 documentation:
             //		Some headers, such as Accept-Language can be sent by clients
             //		as several headers each with a different value rather than
@@ -193,7 +208,15 @@ public final class Proxy implements HTTPProxy {
                 proxyRequest.addHeader(headerName, headerValue);
             }
         }
+        HeaderGroup replacements = headerModificatons.additions(servletRequest);
+        for (Header header : replacements.getAllHeaders()) {
+            proxyRequest.addHeader(header);
+        }
+
     }
+
+
+
 
 
     /**
@@ -321,6 +344,10 @@ public final class Proxy implements HTTPProxy {
     }
 
 
+    public void setHeaderModificatons(HeaderModificatons headerModificatons) {
+        this.headerModificatons = headerModificatons;
+    }
+
     private String rewriteUrlFromResponse(HttpServletRequest servletRequest, String theUrl) {
         //TODO document example paths
         if (theUrl.startsWith(this.target.toString())) {
@@ -351,5 +378,28 @@ public final class Proxy implements HTTPProxy {
         for (String header : headers) {
             hopByHopHeaders.addHeader(new BasicHeader(header, null));
         }
+    }
+
+    /**
+     * Interface that provides an extension point to replace headers within the proxy request.
+     * Instances of this class can be set via
+     */
+    public static interface HeaderModificatons {
+
+        /**
+         * Returns a number of header-nams that should be stripped from the proxy request.
+         * @param servletRequest
+         * @return
+         */
+        Set<String> removals(HttpServletRequest servletRequest);
+
+        /**
+         * Returns a number of headers that should be additionally provided to the proxy request.
+         * Replacements can be specified by providing a removal and an addition for the same header.
+         * @param servletRequest
+         * @return
+         */
+        HeaderGroup additions(HttpServletRequest servletRequest);
+
     }
 }
