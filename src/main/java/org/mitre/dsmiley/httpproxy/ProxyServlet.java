@@ -25,10 +25,6 @@ import org.apache.http.params.HttpParams;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -46,7 +42,7 @@ import java.net.URI;
  *
  * @author David Smiley dsmiley@mitre.org>
  */
-public class ProxyServlet extends HttpServlet {
+public class ProxyServlet extends AbstractProxyServlet {
 
   /* INIT PARAMETER NAME CONSTANTS */
 
@@ -59,7 +55,6 @@ public class ProxyServlet extends HttpServlet {
 
     protected boolean doLog = false;
     protected URI targetUri;
-    private HTTPProxy proxy;
 
     @Override
     public String getServletInfo() {
@@ -67,9 +62,7 @@ public class ProxyServlet extends HttpServlet {
     }
 
     @Override
-    public void init(ServletConfig servletConfig) throws ServletException {
-        super.init(servletConfig);
-
+    protected HTTPProxy createProxy(ServletConfig servletConfig) throws ServletException {
         String doLogStr = servletConfig.getInitParameter(P_LOG);
         if (doLogStr != null) {
             this.doLog = Boolean.parseBoolean(doLogStr);
@@ -83,17 +76,7 @@ public class ProxyServlet extends HttpServlet {
         HttpParams hcParams = new BasicHttpParams();
         readConfigParam(hcParams, ClientPNames.HANDLE_REDIRECTS, Boolean.class);
         HttpClient httpClient = createHttpClient(hcParams);
-        proxy = createProxy(httpClient);
-
-    }
-
-    protected Proxy createProxy(HttpClient httpClient) {
         return new Proxy(targetUri, httpClient, "", doLog);
-    }
-
-    @Override
-    protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
-        proxy.service(servletRequest, servletResponse);
     }
 
     /**
@@ -125,14 +108,6 @@ public class ProxyServlet extends HttpServlet {
             }
         }
         hcParams.setParameter(hcParamName, val_obj);
-    }
-
-    @Override
-    public void destroy() {
-        if (proxy != null) {
-            proxy.shutdown();
-        }
-        super.destroy();
     }
 
 }

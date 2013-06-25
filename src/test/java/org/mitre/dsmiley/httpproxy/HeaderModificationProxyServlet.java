@@ -1,11 +1,11 @@
 package org.mitre.dsmiley.httpproxy;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.HeaderGroup;
 
@@ -24,9 +24,10 @@ public class HeaderModificationProxyServlet extends ProxyServlet {
         addedHeaders.addHeader(new BasicHeader("X-ReplacedHeader","replaced"));
     }
 
+
     @Override
-    protected Proxy createProxy(HttpClient httpClient) {
-        Proxy proxy = super.createProxy(httpClient);
+    protected HTTPProxy createProxy(ServletConfig servletConfig) throws ServletException {
+        HTTPProxy proxy = super.createProxy(servletConfig);
         proxy.setHeaderModificatons(new Proxy.HeaderModificatons() {
             public Set<String> removals(HttpServletRequest servletRequest) {
                 return removedHeaders;
@@ -38,4 +39,5 @@ public class HeaderModificationProxyServlet extends ProxyServlet {
         });
         return proxy;
     }
+
 }

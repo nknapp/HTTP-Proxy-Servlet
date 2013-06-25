@@ -11,7 +11,7 @@ public class HeaderModificationTest extends AbstractProxyServletTest {
 
 
     @Override
-    protected Class<? extends ProxyServlet> proxyServletClass() {
+    protected Class<? extends AbstractProxyServlet> proxyServletClass() {
         return HeaderModificationProxyServlet.class;
     }
 

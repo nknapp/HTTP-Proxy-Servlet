@@ -115,7 +115,7 @@ public class AbstractProxyServletTest {
      * Override in sub-classes to test other ProxyServlet instances
      * @return
      */
-    protected Class<? extends ProxyServlet> proxyServletClass() {
+    protected Class<? extends AbstractProxyServlet> proxyServletClass() {
         return ProxyServlet.class;
     }
 
