@@ -184,7 +184,7 @@ public final class Proxy implements HTTPProxy {
                 continue;
             if (hopByHopHeaders.containsHeader(headerName))
                 continue;
-            if (headerModificatons.removals(servletRequest).contains(headerName)) {
+            if (headerModificatons.removals().containsHeader(headerName)) {
                 continue;
             }
 
@@ -208,15 +208,12 @@ public final class Proxy implements HTTPProxy {
                 proxyRequest.addHeader(headerName, headerValue);
             }
         }
-        HeaderGroup replacements = headerModificatons.additions(servletRequest);
+        HeaderGroup replacements = headerModificatons.additions();
         for (Header header : replacements.getAllHeaders()) {
             proxyRequest.addHeader(header);
         }
 
     }
-
-
-
 
 
     /**

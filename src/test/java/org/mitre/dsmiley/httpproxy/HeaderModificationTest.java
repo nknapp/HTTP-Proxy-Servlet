@@ -25,6 +25,16 @@ public class HeaderModificationTest extends AbstractProxyServletTest {
     }
 
     @Test
+    public void testRemoveHeaderCaseInsensitive() throws Exception {
+        GetMethodWebRequest request = makeGetMethodRequest(sourceBaseUri);
+        request.setHeaderField("x-removedheader","testValue");
+        WebResponse webResponse = execAssert(request);
+        String responseText = webResponse.getText();
+        Assert.assertFalse("Check for X-RemovedHeader", responseText.contains("X-RemovedHeader:"));
+        Assert.assertFalse("Check for x-removedheader", responseText.contains("x-removedheader:"));
+    }
+
+    @Test
     public void testReplaceHeader() throws Exception {
         GetMethodWebRequest request = makeGetMethodRequest(sourceBaseUri);
         request.setHeaderField("X-ReplacedHeader","testValue");

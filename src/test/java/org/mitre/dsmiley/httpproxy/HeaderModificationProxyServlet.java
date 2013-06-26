@@ -1,10 +1,7 @@
 package org.mitre.dsmiley.httpproxy;
 
-import java.util.HashSet;
-import java.util.Set;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.HeaderGroup;
@@ -12,10 +9,10 @@ import org.apache.http.message.HeaderGroup;
 /** @author knappmeier */
 public class HeaderModificationProxyServlet extends ProxyServlet {
 
-    private static Set<String> removedHeaders = new HashSet<String>();
+    private static HeaderGroup removedHeaders = new HeaderGroup();
     static {
-        removedHeaders.add("X-RemovedHeader");
-        removedHeaders.add("X-ReplacedHeader");
+        removedHeaders.addHeader(new BasicHeader("X-RemovedHeader",null));
+        removedHeaders.addHeader(new BasicHeader("X-ReplacedHeader", null));
     }
 
     private static HeaderGroup addedHeaders = new HeaderGroup();
@@ -29,11 +26,11 @@ public class HeaderModificationProxyServlet extends ProxyServlet {
     protected HTTPProxy createProxy(ServletConfig servletConfig) throws ServletException {
         HTTPProxy proxy = super.createProxy(servletConfig);
         proxy.setHeaderModificatons(new Proxy.HeaderModificatons() {
-            public Set<String> removals(HttpServletRequest servletRequest) {
+            public HeaderGroup removals() {
                 return removedHeaders;
             }
 
-            public HeaderGroup additions(HttpServletRequest servletRequest) {
+            public HeaderGroup additions() {
                 return addedHeaders;
             }
         });

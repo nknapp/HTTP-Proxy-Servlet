@@ -10,9 +10,39 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * HTTPProxyServlet that retrieve its proxy-instance from a spring container.
- * The bean name must be configured.
  *
- * <
+ * <h1>Example-configuration in web.xml</h1>
+ *
+ * <pre>
+ * {@code
+ *
+ * <servlet>
+ *      <servlet-name>ProxyServlet</servlet-name>
+ *      <servlet-class>org.mitre.dsmiley.httpproxy.spring.SpringHTTPProxyServlet</servlet-class>
+ *      <init-param>
+ *          <param-name>proxyBeanName</param-name>
+ *          <param-value>proxy</param-value>
+ *      </init-param>
+ *      <load-on-startup>1</load-on-startup>
+ * </servlet>
+ * <servlet-mapping>
+ *      <servlet-name>ProxyServlet</servlet-name>
+ *      <url-pattern>/proxy/*</url-pattern>
+ * </servlet-mapping>
+ * }
+ * </pre>
+ *
+ * <h1>Corresponding spring-configuration</h1>
+ *
+ * <pre>{@code
+ *    <bean id="proxy" class="org.mitre.dsmiley.httpproxy.spring.SpringProxyFactory" factory-method="createProxy">
+ *      <constructor-arg index="0" value="http://localhost:8090,http://localhost:8091,http://localhost:8092" />
+ *      <constructor-arg index="1" value="" />
+ *      <constructor-arg index="2" value="1" />
+ *    </bean>
+ * }
+ *
+ * </pre>
  *
  * @author knappmeier */
 public class SpringHTTPProxyServlet extends AbstractProxyServlet {
