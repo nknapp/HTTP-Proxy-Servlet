@@ -4,7 +4,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Set;
 
 import org.apache.http.message.HeaderGroup;
 
@@ -15,6 +14,8 @@ import org.apache.http.message.HeaderGroup;
  *         Created on 4/26/13 10:02 AM
  */
 public interface HTTPProxy {
+
+
 
     /**
      * Release any resource held by this proxy.
@@ -55,4 +56,23 @@ public interface HTTPProxy {
         HeaderGroup additions();
 
     }
+
+    /**
+     * Null-Object for HeaderModifications
+     */
+    HeaderModificatons NULL_HEADER_MODIFICATONS = new HeaderModificatons() {
+
+        private HeaderGroup EMPTY_HEADER_GROUP = new HeaderGroup();
+
+        @Override
+        public HeaderGroup removals() {
+            return EMPTY_HEADER_GROUP;
+        }
+
+        @Override
+        public HeaderGroup additions() {
+            return EMPTY_HEADER_GROUP;
+        }
+    };
+
 }

@@ -28,10 +28,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Formatter;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -43,21 +41,14 @@ import java.util.logging.Logger;
  *         Created on 4/26/13 7:48 AM
  */
 public final class Proxy implements HTTPProxy {
+
     private final Logger log = Logger.getLogger(getClass().getName());
     private boolean doLog = false;
     private HttpClient proxyClient;
     private URI target;
     //the path to the proxy, this will be stripped out of the request to be made against the target
     private String proxyPath;
-    private HeaderModificatons headerModificatons = new HeaderModificatons() {
-        public Set<String> removals(HttpServletRequest servletRequest) {
-            return Collections.emptySet();
-        }
-
-        public HeaderGroup additions(HttpServletRequest servletRequest) {
-            return new HeaderGroup();
-        }
-    };
+    private HeaderModificatons headerModificatons = NULL_HEADER_MODIFICATONS;
 
     public Proxy(URI target, String proxyPath) {
         this(target, new DefaultHttpClient(new ThreadSafeClientConnManager(), new BasicHttpParams()), proxyPath);
